@@ -9,14 +9,14 @@ fn test_hash() {
         let z = pos.z.wrapping_mul(83492791);
         x ^ y ^ z
     };
-    let result = hash(&pos);
+    let result = unsafe { hash(&pos) };
     assert_eq!(result, expected);
 }
 
 #[test]
 fn test_binary_search_first_grid_found() {
     let grid_pos = Int3 { x: 1, y: 2, z: 3 };
-    let expected_hash = hash(&grid_pos);
+    let expected_hash = unsafe { hash(&grid_pos) };
 
     let array = [
         HashAndIndex {
@@ -34,8 +34,9 @@ fn test_binary_search_first_grid_found() {
     ];
 
     let mut out_hash = -1;
-    let index =
-        binary_search_first_grid(&grid_pos, array.as_ptr(), array.len() as i32, &mut out_hash);
+    let index = unsafe {
+        binary_search_first_grid(&grid_pos, array.as_ptr(), array.len() as i32, &mut out_hash)
+    };
 
     assert_eq!(out_hash, expected_hash);
     assert_eq!(index, 1);
@@ -51,8 +52,10 @@ fn test_binary_search_first_grid_not_found() {
 
     let pos = Int3 { x: 1, y: 1, z: 1 };
     let mut out_hash = -1;
-    let result = binary_search_first_grid(&pos, array.as_ptr(), array.len() as i32, &mut out_hash);
+    let result = unsafe {
+        binary_search_first_grid(&pos, array.as_ptr(), array.len() as i32, &mut out_hash)
+    };
 
     assert_eq!(result, -1);
-    assert_eq!(out_hash, hash(&pos));
+    assert_eq!(out_hash, unsafe { hash(&pos) });
 }

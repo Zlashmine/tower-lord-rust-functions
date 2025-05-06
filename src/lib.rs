@@ -18,8 +18,13 @@ pub struct HashAndIndex {
     pub index: i32,
 }
 
+/// Computes a hash value from a 3D grid position using large prime multipliers.
+///
+/// # Safety
+/// - `grid_pos` must be a valid, non-null pointer to an `Int3`.
+/// - The pointer must be properly aligned and point to initialized memory.
 #[no_mangle]
-pub extern "C" fn hash(grid_pos: *const Int3) -> i32 {
+pub unsafe extern "C" fn hash(grid_pos: *const Int3) -> i32 {
     let pos = unsafe { &*grid_pos };
 
     let x = pos.x.wrapping_mul(73856093);
@@ -37,8 +42,16 @@ pub extern "C" fn grid_position(position: Float3, cell_size: f32) -> Int3 {
     }
 }
 
+/// Performs a binary search on a sorted array of `HashAndIndex` using the hash of the provided grid position.
+/// Writes the computed hash to `out_hash`.
+///
+/// # Safety
+/// - `grid_pos` must be a valid, non-null pointer to an `Int3`.
+/// - `array` must point to a valid contiguous buffer of at least `length` elements.
+/// - `out_hash` must be a valid, non-null pointer to an `i32`.
+/// - All pointers must be properly aligned and not aliased for mutable access.
 #[no_mangle]
-pub extern "C" fn binary_search_first_grid(
+pub unsafe extern "C" fn binary_search_first_grid(
     grid_pos: *const Int3,
     array: *const HashAndIndex,
     length: i32,
